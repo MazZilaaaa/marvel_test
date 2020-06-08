@@ -1,3 +1,4 @@
+import DeepDiff
 import UIKit
 
 /// Список героев
@@ -31,16 +32,7 @@ final class HeroesViewController: UIViewController, AlertPresentable {
         }
     }
     
-    private var characters: [Character] = [] {
-        didSet {
-            var arrayIndexPath = [IndexPath]()
-            
-            for item in 1 ... EndpointConstants.limit {
-                arrayIndexPath.append(IndexPath(row: characters.count - item, section: 0))
-            }
-            tableView.insertRows(at: arrayIndexPath, with: .automatic)
-        }
-    }
+    private var characters: [Character] = []
 
     // MARK: - UIViewController
     
@@ -66,14 +58,22 @@ final class HeroesViewController: UIViewController, AlertPresentable {
     private func fetchCharacters(page: Int) {
         isFetching = true
         service.fetchCharacters(by: page) { [weak self] result in
+            guard let self = self else { return }
             switch result {
-            case .success(let response):
-                self?.characters += response
+            case .success(let characters):
+                self.insert(new: characters)
             case .failure(let error):
-                self?.showAlert(errorDescription: error.description)
+                self.showAlert(errorDescription: error.description)
             }
-            self?.isFetching = false
+            self.isFetching = false
         }
+    }
+    
+    private func insert(new: [Character]) {
+        let totalCharacters = self.characters + new
+        let changes = diff(old: self.characters, new: totalCharacters)
+        self.tableView.reload(changes: changes, updateData: { self.characters = totalCharacters })
+        
     }
 }
 

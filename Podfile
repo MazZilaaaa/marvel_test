@@ -6,5 +6,6 @@ target 'MarvelTestProject' do
   use_frameworks!
 
   pod 'SwiftLint'
+  pod 'DeepDiff'
 
 end

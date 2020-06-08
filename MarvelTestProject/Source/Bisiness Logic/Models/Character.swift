@@ -1,7 +1,8 @@
+import DeepDiff
 import Foundation
 
 /// Модель менаджера
-struct Character: Codable {
+struct Character: Hashable, Codable, DiffAware {
     
     /// Идентификатор
     let id: Int
@@ -20,17 +21,22 @@ struct Character: Codable {
     
     /// Серии
     let series: Series
+    
+    // достаточно посчитать хэш по айди
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 /// Серия
-struct Series: Codable {
+struct Series: Hashable, Codable {
     
     /// Количество
     let available: Int
 }
 
 /// Ссылка на изображение с расширением
-struct Thumbnail: Codable {
+struct Thumbnail: Hashable, Codable {
     
     /// Путь
     let path: String
@@ -40,7 +46,7 @@ struct Thumbnail: Codable {
 }
 
 /// Комиксы
-struct Comics: Codable {
+struct Comics: Hashable, Codable {
     
     /// Количество
     let available: Int
